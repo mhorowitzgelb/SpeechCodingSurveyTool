@@ -20,6 +20,8 @@ using System.ServiceModel.Channels;
 using System.ServiceModel;
 using System.Threading;
 using NAudio.Wave;
+using System.Web.Script.Serialization;
+
 namespace SpeechSample
 {
     [DataContract]
@@ -135,20 +137,7 @@ namespace SpeechSample
         }
     }
 
-    class BingVoiceJson {
-        public string status;
-        public string scenario;
-        public string lexical;
-        class Properties
-        {
-            public string requestid;
-            public int NOSPEECH;
-            public int FALSERECO;
-            public int HIGHCONF;
-            public int MIDCONF;
-            public int LOWCONF;
-        }
-    }
+    
 
 
     /*
@@ -159,7 +148,7 @@ namespace SpeechSample
      */
     public class BingVoice
     {
-        public static string requestBingVoice(string filename)
+        public static dynamic requestBingVoice(string filename)
         {
 
             string endpoint = "https://speech.platform.bing.com/recognize";
@@ -255,14 +244,18 @@ namespace SpeechSample
                         responseString = sr.ReadToEnd();
                     }
 
-                    return responseString;
+
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+
+                   return js.Deserialize<dynamic>(responseString);
                 }
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 Console.WriteLine(ex.Message);
-                return "";
+                return null;
             }
         }
     }

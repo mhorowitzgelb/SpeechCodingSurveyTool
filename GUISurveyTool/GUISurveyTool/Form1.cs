@@ -73,8 +73,8 @@ namespace GUISurveyTool
 
         private void button2_Click(object sender, EventArgs e)
         {
-            string sample = SpeechSample.BingVoice.requestBingVoice(filePrefix+recordCount+".wav");
-            textBoxSampleOutput.Text = sample;
+            dynamic sample = SpeechSample.BingVoice.requestBingVoice(filePrefix+recordCount+".wav");
+            textBoxSampleOutput.Text = sample["header"]["lexical"];
         }
     }
 }
