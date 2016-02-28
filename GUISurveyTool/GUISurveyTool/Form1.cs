@@ -3,6 +3,7 @@
 using System.Windows.Forms;
 
 using NAudio.Wave;
+using System.IO;
 
 namespace GUISurveyTool
 {
@@ -10,9 +11,11 @@ namespace GUISurveyTool
     {
         private bool recording = false;
         private WaveIn recorder;
-        private BufferedWaveProvider bufferedWaveProvider;
-        private SavingWaveProvider savingWaveProvider;
-        private WaveOut player;
+        private WaveFileWriter waveWriter;
+
+        private int deviceNumber;
+        private int recordCount = 0;
+        private string filePrefix = "recordFile";
 
 
 
@@ -25,18 +28,24 @@ namespace GUISurveyTool
         {
             if (!recording)
             {
-                if(player != null)
-                {
-                    player.Stop();
-                }
+                recordCount++;
+
+                string filename = filePrefix + recordCount + ".wav";
+
+                FileStream fs = File.OpenWrite(filename);
+                fs.Close();
+
                 recording = true;
 
                 button2.Visible = false;
                 button1.Text = "Stop Recording";
 
                 recorder = new WaveIn();
+                recorder.DeviceNumber = deviceNumber;
+                recorder.WaveFormat = new WaveFormat(16000, WaveIn.GetCapabilities(deviceNumber).Channels);
                 recorder.DataAvailable += RecorderOnDataAvailable;
-                bufferedWaveProvider = new BufferedWaveProvider(recorder.WaveFormat);
+
+                waveWriter = new WaveFileWriter(filename, recorder.WaveFormat);
 
                 recorder.StartRecording();
 
@@ -44,8 +53,10 @@ namespace GUISurveyTool
             else
             {
                 recorder.StopRecording();
-                player = new WaveOut();
-                player.Init(bufferedWaveProvider);
+                waveWriter.Close();
+                recorder.Dispose();
+                //player = new WaveOut();
+                //player.Init(bufferedWaveProvider);
 
                 button2.Visible = true;
                 recording = false;
@@ -54,16 +65,16 @@ namespace GUISurveyTool
             
         }
 
-        private void RecorderOnDataAvailable(object sender, WaveInEventArgs waveInEventArgs)
+        private void RecorderOnDataAvailable(object sender, WaveInEventArgs e)
         {
-            bufferedWaveProvider.AddSamples(waveInEventArgs.Buffer, 0, 
-                waveInEventArgs.BytesRecorded);
+            waveWriter.Write(e.Buffer, 0, e.BytesRecorded);
+            waveWriter.Flush();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
-            player.Play();
+            string sample = SpeechSample.BingVoice.requestBingVoice(filePrefix+recordCount+".wav");
+            textBoxSampleOutput.Text = sample;
         }
     }
 }

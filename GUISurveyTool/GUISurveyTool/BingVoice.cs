@@ -135,22 +135,36 @@ namespace SpeechSample
         }
     }
 
+    class BingVoiceJson {
+        public string status;
+        public string scenario;
+        public string lexical;
+        class Properties
+        {
+            public string requestid;
+            public int NOSPEECH;
+            public int FALSERECO;
+            public int HIGHCONF;
+            public int MIDCONF;
+            public int LOWCONF;
+        }
+    }
+
+
     /*
      * This sample program shows how to send an speech recognition request to the 
      * Microsoft Speech service. 
      * Please also refer to the readme file at http://1drv.ms/1MvuJdF
      * API documentation can be found at http://1drv.ms/1MvurDE
      */
-    class BingVoice
+    public class BingVoice
     {
-        static string requestBingVoice(BufferedWaveProvider waveProvider)
+        public static string requestBingVoice(string filename)
         {
 
             string endpoint = "https://speech.platform.bing.com/recognize";
 
-            Console.WriteLine("Test");
 
-            Console.ReadLine();
 
             AdmAccessToken admToken;
             string headerValue;
@@ -178,7 +192,7 @@ namespace SpeechSample
             /*
              * Input your own audio file or use read from a microphone stream directly.
              */
-
+            FileStream fs = null;
             string responseString;
 
             try
@@ -205,27 +219,27 @@ namespace SpeechSample
 
 
 
+                using(fs = new FileStream(filename, FileMode.Open, FileAccess.Read)){
 
-
-                /*
-                    * Open a request stream and write 1024 byte chunks in the stream one at a time.
-                    */
-                byte[] buffer = null;
-                int bytesRead = 0;
-                using (Stream requestStream = request.GetRequestStream())
-                {
                     /*
-                        * Read 1024 raw bytes from the input audio file.
+                        * Open a request stream and write 1024 byte chunks in the stream one at a time.
                         */
-                    buffer = new Byte[checked((uint)Math.Min(1024, (int)waveProvider.BufferLength))];
-                    while (waveProvider.BufferedBytes != 0)
+                    byte[] buffer = null;
+                    int bytesRead = 0;
+                    using (Stream requestStream = request.GetRequestStream())
                     {
-                        waveProvider.Read(buffer, 0, buffer.Length);
-                        requestStream.Write(buffer, 0, bytesRead);
-                    }
+                        /*
+                            * Read 1024 raw bytes from the input audio file.
+                            */
+                        buffer = new Byte[checked((uint)Math.Min(1024, (int)fs.Length))];
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) != 0)
+                        {
+                            requestStream.Write(buffer, 0, bytesRead);
+                        }
 
-                    // Flush
-                    requestStream.Flush();
+                        // Flush
+                        requestStream.Flush();
+                    }
                 }
 
                 /*
@@ -241,13 +255,14 @@ namespace SpeechSample
                         responseString = sr.ReadToEnd();
                     }
 
-                    Console.WriteLine(responseString);
+                    return responseString;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 Console.WriteLine(ex.Message);
+                return "";
             }
         }
     }
