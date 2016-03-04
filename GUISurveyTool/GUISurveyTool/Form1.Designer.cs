@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.textBoxSampleOutput = new System.Windows.Forms.TextBox();
+            this.cancelCommitBtn = new System.Windows.Forms.Button();
+            this.commitBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -43,32 +44,44 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(242, 127);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(99, 65);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Transcribe";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Visible = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // textBoxSampleOutput
             // 
             this.textBoxSampleOutput.Location = new System.Drawing.Point(12, 198);
             this.textBoxSampleOutput.Multiline = true;
             this.textBoxSampleOutput.Name = "textBoxSampleOutput";
-            this.textBoxSampleOutput.Size = new System.Drawing.Size(498, 194);
+            this.textBoxSampleOutput.Size = new System.Drawing.Size(533, 274);
             this.textBoxSampleOutput.TabIndex = 2;
+            // 
+            // cancelCommitBtn
+            // 
+            this.cancelCommitBtn.Location = new System.Drawing.Point(447, 127);
+            this.cancelCommitBtn.Name = "cancelCommitBtn";
+            this.cancelCommitBtn.Size = new System.Drawing.Size(75, 49);
+            this.cancelCommitBtn.TabIndex = 3;
+            this.cancelCommitBtn.Text = "Cancel";
+            this.cancelCommitBtn.UseVisualStyleBackColor = true;
+            this.cancelCommitBtn.Visible = false;
+            this.cancelCommitBtn.Click += new System.EventHandler(this.cancelCommitBtn_Click);
+            // 
+            // commitBtn
+            // 
+            this.commitBtn.Location = new System.Drawing.Point(36, 127);
+            this.commitBtn.Name = "commitBtn";
+            this.commitBtn.Size = new System.Drawing.Size(75, 49);
+            this.commitBtn.TabIndex = 4;
+            this.commitBtn.Text = "Commit";
+            this.commitBtn.UseVisualStyleBackColor = true;
+            this.commitBtn.Visible = false;
+            this.commitBtn.Click += new System.EventHandler(this.commitBtn_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(557, 418);
+            this.ClientSize = new System.Drawing.Size(557, 484);
+            this.Controls.Add(this.commitBtn);
+            this.Controls.Add(this.cancelCommitBtn);
             this.Controls.Add(this.textBoxSampleOutput);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -80,8 +93,9 @@
         #endregion
 
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TextBox textBoxSampleOutput;
+        private System.Windows.Forms.Button cancelCommitBtn;
+        private System.Windows.Forms.Button commitBtn;
     }
 }
 

@@ -17,11 +17,29 @@ namespace GUISurveyTool
         private int recordCount = 0;
         private string filePrefix = "recordFile";
 
+        private string gitFolderPath;
+        private string interviewName;
 
 
-        public Form1()
+
+        public Form1(string gitFolderPath, string interviewName)
         {
+            this.gitFolderPath = gitFolderPath;
+            this.interviewName = interviewName;
+            runCmd(gitFolderPath, "mkdir " + interviewName);
+            System.Diagnostics.Process.Start("Notepad++.exe", gitFolderPath + "\\" + interviewName + "\\" + interviewName + ".java");
             InitializeComponent();
+        }
+
+        private void runCmd(string dir, string commands)
+        {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C cd "+ dir +" & " + commands;
+            process.StartInfo = startInfo;
+            process.Start();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -30,14 +48,14 @@ namespace GUISurveyTool
             {
                 recordCount++;
 
-                string filename = filePrefix + recordCount + ".wav";
+                string filename = gitFolderPath +"\\"+interviewName+"\\"
+                    + filePrefix + recordCount + ".wav";
 
                 FileStream fs = File.OpenWrite(filename);
                 fs.Close();
 
                 recording = true;
 
-                button2.Visible = false;
                 button1.Text = "Stop Recording";
 
                 recorder = new WaveIn();
@@ -58,9 +76,27 @@ namespace GUISurveyTool
                 //player = new WaveOut();
                 //player.Init(bufferedWaveProvider);
 
-                button2.Visible = true;
+                button1.Visible = false;
+
                 recording = false;
                 button1.Text = "Start Recording";
+
+                dynamic sample = SpeechSample.BingVoice.requestBingVoice(gitFolderPath +"\\"+interviewName +"\\" +
+                    filePrefix + recordCount + ".wav");
+                textBoxSampleOutput.Text = sample["header"]["name"];
+
+                commitBtn.Visible = true;
+                cancelCommitBtn.Visible = true;
+                
+                for(int i = 0; i < Math.Min(1, sample["results"].Length); i++){
+                    dynamic result = sample["results"][i];
+                    foreach(dynamic token in result["tokens"])
+                    {
+                        Console.WriteLine("Lexical: " + token["token"]);
+                        Console.WriteLine("Pronunciation: " + token["pronunciation"]);
+                        Console.WriteLine();
+                    }
+                }
             }
             
         }
@@ -71,10 +107,23 @@ namespace GUISurveyTool
             waveWriter.Flush();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+
+        private void commitBtn_Click(object sender, EventArgs e)
         {
-            dynamic sample = SpeechSample.BingVoice.requestBingVoice(filePrefix+recordCount+".wav");
-            textBoxSampleOutput.Text = sample["header"]["lexical"];
+            runCmd(gitFolderPath, "git add -A & git commit -a -m \""+
+                interviewName+"_edit"+recordCount+":Bing Transcript: "+textBoxSampleOutput.Text+"\"");
+            commitBtn.Visible = false;
+            cancelCommitBtn.Visible = false;
+            button1.Visible = true;
+        }
+
+        private void cancelCommitBtn_Click(object sender, EventArgs e)
+        {
+            runCmd(gitFolderPath + "\\" + interviewName, "del "+filePrefix+recordCount+".wav" );
+            recordCount--;
+            commitBtn.Visible = false;
+            cancelCommitBtn.Visible = false;
+            button1.Visible = true;
         }
     }
 }

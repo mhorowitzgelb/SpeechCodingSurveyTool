@@ -247,6 +247,8 @@ namespace SpeechSample
 
                     JavaScriptSerializer js = new JavaScriptSerializer();
 
+                    Console.WriteLine("Json:");
+                    Console.WriteLine(responseString);
                    return js.Deserialize<dynamic>(responseString);
                 }
 
